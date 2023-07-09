@@ -3,6 +3,7 @@ import reader from './reader.vue';
 // import router from './router';
 // import store from './store';
 // import 'ant-design-vue/dist/antd.css';
+import 'ant-design-vue/dist/reset.css';
 
 import * as config from './config';
 

@@ -46,7 +46,7 @@ import iconComicShelf from '@/components/icon/icon-comic-shelf.vue';
 import {ComicSource} from '@/interface';
 import request from '@/util/request';
 import {DeleteFilled, FolderOpenFilled} from '@ant-design/icons-vue';
-import {reactive, toRaw} from 'vue';
+import {reactive} from 'vue';
 import {convertFileSrc} from "@tauri-apps/api/tauri";
 
 interface ComicSourceLoad extends ComicSource {

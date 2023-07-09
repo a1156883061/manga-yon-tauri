@@ -20,10 +20,11 @@ export function getImgFromPoint(container: HTMLDivElement): string | null {
 
 export function jumpToReadProcess(returnData: [ComicDocType, string[]]) {
   nextTick(() => {
-    const readProcess = returnData[0].readProcess;
+    const readProcess = returnData[0].readProcess as unknown as number;
     if (readProcess) {
+      let alt = returnData[1][readProcess]
       const imgElement: HTMLImageElement | null = document.querySelector(
-        `[src="${readProcess.replaceAll('\\', '\\\\')}"]`
+        `[alt="${alt.replaceAll('\\', '\\\\')}"]`
       );
       console.log('read imgElement', imgElement);
       if (imgElement) {

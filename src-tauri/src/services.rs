@@ -127,10 +127,6 @@ pub async fn read_comic(handle: tauri::AppHandle, id: i64) -> Result<()> {
         id.to_string(), /* the unique window label */
         tauri::WindowUrl::App("reader.html".into())
     ).build().unwrap();
-    // let win_clone = docs_window.clone();
-    // docs_window.once("reader_loaded", move |event| {
-    //     win_clone.emit("get_id", id).expect("");
-    // });
     Ok(())
 }
 

@@ -9,6 +9,7 @@
     <div class="content" :style="{ width: contentWidth + 'px' }">
       <div
         v-for="(comic, index) in comics.path"
+        :index="index"
         :key="index"
         class="img-container"
       >
@@ -53,7 +54,7 @@
     title: '',
   });
 
-  let show = ref(true);
+  let show = ref(false);
   /** 显示宽度 */
   const contentWidth = ref(0);
   const dragFlag = ref(false);
