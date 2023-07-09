@@ -12,12 +12,6 @@ pub mod services;
 pub mod dao;
 pub mod common;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -26,8 +20,11 @@ async fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
-            greet,
-            cmd::add_comic
+            cmd::add_comic,
+            cmd::get_store_comic,
+            cmd::comic_delete,
+            cmd::read_comic,
+            cmd::get_comic
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

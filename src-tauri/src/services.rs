@@ -6,6 +6,7 @@ use std::task::{Context, Poll};
 use serde::{Deserialize, Serialize};
 use tauri::api::dialog::FileDialogBuilder;
 use tree_magic::{from_filepath};
+use crate::common::Result;
 use crate::dao;
 use crate::dao::entity::MangaInfo;
 
@@ -111,6 +112,33 @@ pub async fn add_comic() -> Option<MangaInfo> {
     println!("option: {:?}", option);
     option
 }
+
+pub async fn get_store_comic() -> Result<Vec<MangaInfo>> {
+    dao::get_store_comic().await
+}
+
+pub async fn comic_delete(id: i64) -> Result<()> {
+    dao::comic_delete(id).await
+}
+
+pub async fn read_comic(handle: tauri::AppHandle, id: i64) -> Result<()> {
+    let docs_window = tauri::WindowBuilder::new(
+        &handle,
+        id.to_string(), /* the unique window label */
+        tauri::WindowUrl::App("reader.html".into())
+    ).build().unwrap();
+    // let win_clone = docs_window.clone();
+    // docs_window.once("reader_loaded", move |event| {
+    //     win_clone.emit("get_id", id).expect("");
+    // });
+    Ok(())
+}
+
+pub async fn get_path_list(id: i64) -> Result<(MangaInfo, Vec<String>)> {
+    dao::get_path_list(id).await
+}
+
+
 
 fn get_file_list(file: &PathBuf) -> Vec<PathBuf> {
     let parent_path = file.parent().unwrap();

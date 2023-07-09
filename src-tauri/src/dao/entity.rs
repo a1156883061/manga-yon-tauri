@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// 漫画信息
 ///
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct MangaInfo {
     pub id: Option<i64>,

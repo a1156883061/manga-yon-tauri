@@ -35,7 +35,7 @@ interface Channel {
 
   'read_comic': void;
 
-  'get_comic': { id: number; comic: ComicDocType };
+  'get_comic': [ComicDocType, string[]];
 
   'reader/save_read-process': void;
 }

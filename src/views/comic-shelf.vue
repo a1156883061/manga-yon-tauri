@@ -127,7 +127,7 @@ function readComic(
   if (isLoading || isLoading == undefined) {
     return;
   }
-  request('read_comic', toRaw(comicPaths), title, id);
+  request('read_comic', {title, id});
 }
 
 function showContext(comicPath: ComicSourceLoad) {
@@ -136,7 +136,7 @@ function showContext(comicPath: ComicSourceLoad) {
 
 async function deleteComic(comicId: ComicSourceLoad['id']) {
   try {
-    await request('comic_delete', comicId);
+    await request('comic_delete', {id: comicId});
     const index = comicSources.findIndex(({id}) => id == comicId);
     comicSources.splice(index, 1);
   } catch {
@@ -144,7 +144,7 @@ async function deleteComic(comicId: ComicSourceLoad['id']) {
   }
 }
 
-// getComics();
+getComics();
 </script>
 
 <style scoped>

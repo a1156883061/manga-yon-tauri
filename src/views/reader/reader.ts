@@ -18,12 +18,9 @@ export function getImgFromPoint(container: HTMLDivElement): string | null {
   return null;
 }
 
-export function jumpToReadProcess(returnData: {
-  id: number;
-  comic: ComicDocType;
-}) {
+export function jumpToReadProcess(returnData: [ComicDocType, string[]]) {
   nextTick(() => {
-    const readProcess = returnData.comic.readProcess;
+    const readProcess = returnData[0].readProcess;
     if (readProcess) {
       const imgElement: HTMLImageElement | null = document.querySelector(
         `[src="${readProcess.replaceAll('\\', '\\\\')}"]`

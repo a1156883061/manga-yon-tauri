@@ -6,14 +6,12 @@
   import { defineComponent } from 'vue';
   import readerContainer from '@/views/reader/reader-container.vue';
 
-  import 'ant-design-vue/lib/button/style/css';
-
   export default defineComponent({
     components: { readerContainer },
   });
 </script>
 
-<style lang="less">
+<style>
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;

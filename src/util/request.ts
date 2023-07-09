@@ -1,7 +1,6 @@
 import {Channel} from '@/interface/Api';
 import {message} from 'ant-design-vue';
-import {invoke} from "@tauri-apps/api/tauri";
-import {toSnakeCase} from "@/util/util";
+import {invoke, InvokeArgs} from "@tauri-apps/api/tauri";
 
 /** 提示消息显示时间 3s */
 const MSG_INTERVAL = 3;
@@ -15,11 +14,11 @@ const MSG_INTERVAL = 3;
 export default async function <K extends keyof Channel, T extends Channel>(
     channel: K,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...args: any[]
+    args?: InvokeArgs
 ): Promise<T[K]> {
     let res = null as any;
     try {
-            res = await invoke(channel);
+            res = await invoke(channel, args);
             console.log("res: ", res);
             return res;
     } catch (e) {

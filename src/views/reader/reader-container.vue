@@ -12,7 +12,7 @@
         :key="index"
         class="img-container"
       >
-        <img :src="comic" :alt="comic" @dragstart.prevent class="comic-img" />
+        <img :src="convertFileSrc(comic)" :alt="comic" @dragstart.prevent class="comic-img" />
       </div>
     </div>
     <div
@@ -33,6 +33,8 @@
   import { getImgFromPoint, jumpToReadProcess } from './reader';
   import MenuBtn from '@/components/menu-btn.vue';
   import SettingMenu from '@/components/setting-menu.vue';
+  import {window as taWin} from "@tauri-apps/api";
+  import {convertFileSrc} from "@tauri-apps/api/tauri";
   let id = 0;
   /**默认宽度百分比 */
   const WIDTH_PERCENT = 0.9;
@@ -65,12 +67,12 @@
    * 获取漫画的地址
    */
   async function getComicPath() {
-    const winId = new URL(window.location.href).searchParams.get('winId');
-    request('get-comic', Number(winId)).then(
-      (returnData: { id: number; comic: ComicDocType }) => {
-        comics.path = returnData.comic.path;
-        id = returnData.id;
-        console.log('readProcess', returnData.comic.readProcess);
+    const winId = taWin.getCurrent().label;
+    request('get_comic', {id: Number(winId)}).then(
+      (returnData: [ComicDocType, string[]]) => {
+        comics.path = returnData[1];
+        id = returnData[0].id as unknown as number;
+        console.log('readProcess', returnData[0].readProcess);
         jumpToReadProcess(returnData);
       }
     );
@@ -81,7 +83,9 @@
   async function initWidth() {
     const width = container.value.getBoundingClientRect().width;
     try {
-      let widthPercent = await request('reader/get-width');
+      let widthPercent = await request('reader/get_width');
+      // TODO 实现
+      widthPercent = 0.9;
       if (widthPercent > WIDTH_PERCENT) {
         widthPercent = WIDTH_PERCENT;
       }
@@ -130,7 +134,7 @@
     // 获取宽度百分比
     const widthPercent =
       contentWidth.value / container.value.getBoundingClientRect().width;
-    request('reader/save-width', widthPercent);
+    request('reader/save_width', {widthPercent});
   }
 
   function dragEnd() {
@@ -158,10 +162,10 @@
       process: getImgFromPoint(container.value),
     });
   }
-  window.ipcRenderer.receive('request-read-process', (arg) => {
-    console.log('received request-read-process msg', arg);
-    saveReadProcess();
-  });
+  // window.ipcRenderer.receive('request-read-process', (arg) => {
+  //   console.log('received request-read-process msg', arg);
+  //   saveReadProcess();
+  // });
 
   // 清除监听
   onUnmounted(() => {
