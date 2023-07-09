@@ -1,5 +1,7 @@
-import { Channel } from '@/interface/Api';
-import { message } from 'ant-design-vue';
+import {Channel} from '@/interface/Api';
+import {message} from 'ant-design-vue';
+import {invoke} from "@tauri-apps/api/tauri";
+import {toSnakeCase} from "@/util/util";
 
 /** 提示消息显示时间 3s */
 const MSG_INTERVAL = 3;
@@ -11,20 +13,18 @@ const MSG_INTERVAL = 3;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function <K extends keyof Channel, T extends Channel>(
-  channel: K,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ...args: any[]
+    channel: K,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...args: any[]
 ): Promise<T[K]> {
-  const res = null as any;
-  if (res.code == 0) {
-    return res.data;
-  }
-  if (res.code > 500) {
-    message.error(res.message, MSG_INTERVAL);
-    console.error('error', res.message);
-    throw new Error(res.message);
-  }
-  message.warning(res.message, MSG_INTERVAL);
-  console.error('error', res.message);
-  throw new Error(res.message);
+    let res = null as any;
+    try {
+            res = await invoke(channel);
+            console.log("res: ", res);
+            return res;
+    } catch (e) {
+        message.error(e as string, MSG_INTERVAL);
+        console.error('error', e as string);
+        throw new Error(e as string);
+    }
 }
