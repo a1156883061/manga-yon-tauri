@@ -24,7 +24,7 @@
               class="mo-spin"
           >
             <div class="cover-container">
-              <img :src="comic.coverPath" :alt="comic.title"/>
+              <img :src="comic.coverPath ? convertFileSrc(comic.coverPath): null" :alt="comic.title"/>
             </div>
           </a-spin>
           <a-card-meta :title="comic.title"></a-card-meta>
@@ -47,6 +47,7 @@ import {ComicSource} from '@/interface';
 import request from '@/util/request';
 import {DeleteFilled, FolderOpenFilled} from '@ant-design/icons-vue';
 import {reactive, toRaw} from 'vue';
+import {convertFileSrc} from "@tauri-apps/api/tauri";
 
 interface ComicSourceLoad extends ComicSource {
   isLoading?: boolean;
@@ -75,26 +76,25 @@ async function addComic(
     comicSources[index] = reactive(comicSources[index]);
     comicSources[index].isLoading = false;
     // 添加失败，删除占位元素
-    if (typeof newComic == 'boolean') {
+    if (newComic == null) {
       comicSources.splice(index, 1);
       return;
     }
     if (!(newComic instanceof Array)) {
       newComic.isLoading = false;
-      newComic.coverPath = newComic.path[0];
+      // newComic.coverPath = newComic.coverPath;
       comicSources[index] = newComic;
       return;
     }
     if (newComic.length > 0) {
       comicSources.splice(index, 1);
       newComic
-      .map((eachComic) => {
-        return Object.assign(eachComic, {
-          isLoading: false,
-          coverPath: eachComic.path[0],
-        });
-      })
-      .forEach((eachComic) => comicSources.unshift(eachComic));
+          .map((eachComic) => {
+            return Object.assign(eachComic, {
+              isLoading: false,
+            });
+          })
+          .forEach((eachComic) => comicSources.unshift(eachComic));
     } else {
       comicSources.splice(index, 1);
     }
