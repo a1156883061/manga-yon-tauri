@@ -17,27 +17,27 @@ interface Channel {
   /**
    * 删除漫画
    */
-  'comic-delete': void;
+  'comic_delete': void;
   /**
    * 保存宽度百分比
    */
-  'reader/save-width': void;
+  'reader/save_width': void;
   /**
    * 获取宽度百分比
    */
-  'reader/get-width': number;
+  'reader/get_width': number;
 
-  'add-comic': ComicDocType | false;
+  'add_comic': ComicDocType | false;
 
-  'add-comic-folder': ComicDocType[] | false;
+  'add_comic_folder': ComicDocType[] | false;
 
-  'get-store-comic': ComicSource[];
+  'get_store_comic': ComicSource[];
 
-  'read-comic': void;
+  'read_comic': void;
 
-  'get-comic': { id: number; comic: ComicDocType };
+  'get_comic': { id: number; comic: ComicDocType };
 
-  'reader/save-read-process': void;
+  'reader/save_read-process': void;
 }
 
 type saveReadProcess = 'reader/save-read-process';
