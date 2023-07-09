@@ -58,7 +58,7 @@ interface ComicSourceLoad extends ComicSource {
 const comicSources = reactive<ComicSourceLoad[]>([]);
 
 async function addComic(
-    channel: 'add-comic' | 'add-comic-folder' = 'add-comic'
+    channel: 'add_comic' | 'add_comic_folder' = 'add_comic'
 ) {
   const index = 0;
   comicSources.unshift({
@@ -107,11 +107,11 @@ async function addComic(
  * 从文件夹中添加漫画
  */
 async function addComicFolder() {
-  addComic('add-comic-folder');
+  addComic('add_comic_folder');
 }
 
 async function getComics() {
-  const comics = (await request('get-store-comic')) as ComicSourceLoad[];
+  const comics = (await request('get_store_comic')) as ComicSourceLoad[];
   comics.forEach((each) => {
     each.isLoading = false;
   });
@@ -127,7 +127,7 @@ function readComic(
   if (isLoading || isLoading == undefined) {
     return;
   }
-  request('read-comic', toRaw(comicPaths), title, id);
+  request('read_comic', toRaw(comicPaths), title, id);
 }
 
 function showContext(comicPath: ComicSourceLoad) {
@@ -136,7 +136,7 @@ function showContext(comicPath: ComicSourceLoad) {
 
 async function deleteComic(comicId: ComicSourceLoad['id']) {
   try {
-    await request('comic-delete', comicId);
+    await request('comic_delete', comicId);
     const index = comicSources.findIndex(({id}) => id == comicId);
     comicSources.splice(index, 1);
   } catch {
