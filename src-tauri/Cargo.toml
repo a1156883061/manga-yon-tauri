@@ -13,10 +13,16 @@ edition = "2021"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = ["shell-open"] }
+tauri = { version = "1.4", features = ["shell-open", "dialog", "protocol-asset"] }
 serde = { version = "1.0", features = ["derive"] }
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-
+tree_magic = "0.2.3"
+natord = "1.0.9"
+sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "sqlite"] }
+dotenv = "0.15.0"
+lazy_static = "1.4.0"
+futures = "0.3.28"
+tokio = { version = "1.29.0", features = ["macros"] }
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
