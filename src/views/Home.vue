@@ -5,6 +5,7 @@
       :trigger="null"
       collapsible
       style="background: #fafafa"
+      class="sider-layout"
     >
       <div class="logo" />
       <menu-unfold-outlined
@@ -33,7 +34,7 @@
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
-    <a-layout>
+    <a-layout class="main-layout">
       <a-layout-content :class="comicList">
         <comic-shelf />
       </a-layout-content>
@@ -52,7 +53,7 @@
   } from '@ant-design/icons-vue';
 
   const selectedKeys = ref(['1']);
-  const collapsed = ref(false);
+  const collapsed = ref(true);
   const comicList = ref('comic-list');
 </script>
 
@@ -87,5 +88,12 @@
   }
   .mo-menu {
     background-color: #fafafa;
+  }
+
+  .main-layout {
+    overflow: auto;
+  }
+  .sider-layout {
+    padding-top: 16px;
   }
 </style>

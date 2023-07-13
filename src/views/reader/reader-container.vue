@@ -183,7 +183,7 @@
   .container {
     display: flex;
     justify-content: center;
-    background: #292d3e;
+    height: 100%;
   }
 
   .content {
