@@ -1,6 +1,5 @@
 <template>
   <div>
-    <a-button type="primary" @click="showModal">Open Modal</a-button>
     <a-modal v-model:visible="visible" title="Basic Modal">
       <a-form
         :model="formState"
@@ -22,7 +21,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { reactive, ref, watch } from 'vue';
+import {computed, reactive, ref, watch} from 'vue';
 
   interface FormState {
     username: string;
@@ -31,13 +30,18 @@
   }
 
   const props = defineProps<{ show: boolean }>();
+  console.log("model props: ", props);
   const emit = defineEmits<{
-    (e: 'change', visable: boolean): void;
+    (e: 'update:show', visible: boolean): void;
   }>();
 
   let visible = ref(props.show);
+  watch(() => props.show, (newVal) => {
+    console.log('show: ', newVal);
+    visible.value = newVal
+  })
   watch(visible, () => {
-    emit('change', visible.value);
+    emit('update:show', visible.value);
   });
 
   function showModal() {

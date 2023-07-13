@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="container resize-control" @pointermove="resize">
-    <menu-btn />
+    <menu-btn @click="showSetting"/>
     <div
       class="resize-bar left-resize-bar"
       @pointerdown="dragStart(-1)"
@@ -162,6 +162,10 @@
       id,
       process: getImgFromPoint(container.value),
     });
+  }
+
+  function showSetting() {
+    show.value = true
   }
   // window.ipcRenderer.receive('request-read-process', (arg) => {
   //   console.log('received request-read-process msg', arg);
