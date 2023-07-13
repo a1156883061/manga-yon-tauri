@@ -42,7 +42,12 @@ pub async fn init_database() -> Result<()> {
     } else {
         println!("Database already exists");
     }
-    // let mut con = POOL.acquire().await?;
-    // sqlx::migrate!().run(&mut con).await?;
+    Ok(())
+}
+
+pub async fn migrate() -> Result<()>{
+
+    let mut con = POOL.get().unwrap().acquire().await?;
+    sqlx::migrate!().run(&mut con).await?;
     Ok(())
 }

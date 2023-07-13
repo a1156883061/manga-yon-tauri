@@ -159,28 +159,6 @@ async fn add_path<'a>(mut tx: Transaction<'a, Sqlite>, paths: Vec<String>, row_i
     Ok(tx)
 }
 
-async fn complete_todo(pool: &SqlitePool, id: i64) -> Result<bool> {
-    let rows_affected = sqlx::query!(
-        r#"
-create table MangaInfo
-(
-    parent_id   integer,
-    id          integer
-        constraint manga_info_pk
-            primary key,
-    title       integer,
-    path        integer,
-    column_name integer
-)
-        "#
-    )
-        .execute(pool)
-        .await?
-        .rows_affected();
-
-    Ok(rows_affected > 0)
-}
-
 async fn list_todos(pool: &SqlitePool) -> Result<()> {
 //     let recs = sqlx::query!(
 //         r#"
