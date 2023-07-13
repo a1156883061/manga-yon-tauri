@@ -20,5 +20,6 @@
     color: #2c3e50;
     height: 100%;
     background: #292d3e;
+    overflow: auto;
   }
 </style>
