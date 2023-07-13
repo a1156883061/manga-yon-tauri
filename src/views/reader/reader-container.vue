@@ -13,7 +13,7 @@
         :key="index"
         class="img-container"
       >
-        <img :src="convertFileSrc(comic)" :alt="comic" @dragstart.prevent class="comic-img" />
+        <img :src="comic" :alt="comic" @dragstart.prevent class="comic-img" />
       </div>
     </div>
     <div
@@ -71,7 +71,7 @@
     const winId = taWin.getCurrent().label;
     request('get_comic', {id: Number(winId)}).then(
       (returnData: [ComicDocType, string[]]) => {
-        comics.path = returnData[1];
+        comics.path = returnData[1].map(comicPath => convertFileSrc(comicPath));
         id = returnData[0].id as unknown as number;
         console.log('readProcess', returnData[0].readProcess);
         jumpToReadProcess(returnData);
