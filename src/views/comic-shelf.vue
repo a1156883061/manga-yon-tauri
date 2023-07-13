@@ -11,11 +11,11 @@
       </a-card-grid>
       <template v-if="comicSources != null && comicSources.length != 0">
         <a-card-grid
-            class="mo-card-grid"
+            class="mo-card-grid mo-card-grid-comic"
             v-for="(comic, index) in comicSources"
             :key="index"
             @click="readComic(comic.path, comic.title, comic.id, comic.isLoading)"
-            @contextmenu="showContext(comic)"
+            @contextmenu.prevent="showContext(comic)"
         >
           <a-spin
               :spinning="comic.isLoading"
@@ -29,7 +29,7 @@
           </a-spin>
           <a-card-meta :title="comic.title"></a-card-meta>
           <div class="action-container" v-if="comic.showActionFlag" @click.stop>
-            <a-button type="danger" block @click="deleteComic(comic.id)">
+            <a-button type="primary" danger block @click="deleteComic(comic.id)">
               <template #icon>
                 <delete-filled/>
               </template>
@@ -223,6 +223,10 @@ getComics();
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
+}
+
+.mo-card-grid-comic {
+
 }
 
 .action-container {
