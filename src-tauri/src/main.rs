@@ -17,7 +17,7 @@ async fn main() {
     dotenv().ok();
     init::init_database().await.expect("初始化数据库失败");
     init_pool().await;
-    // init::migrate().await.expect("迁移失败");
+    init::migrate().await.expect("迁移失败");
     tauri::Builder::default()
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .invoke_handler(tauri::generate_handler![

@@ -1,4 +1,17 @@
-create table if not exists MangaInfo
+create table dir_info
+(
+    id          integer
+        constraint dir_info_pk
+            primary key autoincrement,
+    name        TEXT,
+    cover       TEXT,
+    sort        integer,
+    create_time integer default current_timestamp,
+    update_time integer,
+    access_time integer default current_timestamp
+);
+
+create table manga_info
 (
     id           integer
         constraint manga_info_pk
@@ -7,7 +20,7 @@ create table if not exists MangaInfo
     title        integer,
     cover_path   TEXT,
     read_process integer default 0,
-    type         text,
+    type_code    text,
     sort         integer,
     create_time  integer default current_timestamp,
     update_time  integer,
@@ -15,7 +28,7 @@ create table if not exists MangaInfo
 );
 
 create index manga_info_parent_id_index
-    on MangaInfo (parent_id);
+    on manga_info (parent_id);
 
 create table path_list
 (
@@ -29,16 +42,4 @@ create table path_list
 create index path_list_manga_id_index
     on path_list (manga_id);
 
-create table dir_info
-(
-    id          integer
-        constraint dir_info_pk
-            primary key autoincrement,
-    name        TEXT,
-    cover       TEXT,
-    sort        integer,
-    create_time integer default current_timestamp,
-    update_time integer,
-    access_time integer default current_timestamp
-);
 

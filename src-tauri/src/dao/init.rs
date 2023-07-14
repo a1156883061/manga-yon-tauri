@@ -18,7 +18,7 @@ lazy_static! {
 }
 
 pub async fn init_pool() {
-    println!("test");
+    println!("data_url: {}", &env::var("DATABASE_URL").expect("未设置数据库连接的环境变量"));
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
         .connect(&env::var("DATABASE_URL").expect("未设置数据库连接的环境变量"))
