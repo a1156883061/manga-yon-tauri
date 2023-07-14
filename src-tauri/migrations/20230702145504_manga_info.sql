@@ -42,4 +42,14 @@ create table path_list
 create index path_list_manga_id_index
     on path_list (manga_id);
 
+create table main.config_dict
+(
+    code integer,
+    val  text
+);
+
+create unique index main.config_dict_code_uindex
+    on main.config_dict (code);
+
+
 
