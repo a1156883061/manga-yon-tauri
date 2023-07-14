@@ -24,7 +24,7 @@
               class="mo-spin"
           >
             <div class="cover-container">
-              <img :src="comic.coverPath ? convertFileSrc(comic.coverPath): null" :alt="comic.title"/>
+              <img :src="comic.coverPath ? convertFileSrc(comic.coverPath): undefined" :alt="comic.title"/>
             </div>
           </a-spin>
           <a-card-meta :title="comic.title"></a-card-meta>
