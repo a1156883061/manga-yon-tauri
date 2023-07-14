@@ -1,7 +1,4 @@
-use sqlx::{Acquire, query, QueryBuilder, Row, Sqlite, Transaction};
-
-
-use sqlx::sqlite::SqlitePool;
+use sqlx::{Acquire, query, QueryBuilder, Sqlite, Transaction};
 use tokio::join;
 use common::Result;
 use crate::common;
@@ -15,7 +12,6 @@ pub mod entity;
 const BIND_LIMIT: usize = 1000;
 
 pub(crate) async fn add_comic(manga: &MangaInfo, path: Vec<String>) -> Result<()> {
-    println!("POOL: {:?}", get_pool());
     let mut tx = get_pool().begin().await.expect("");
 
     // Insert the task, then obtain the ID of this row
@@ -157,27 +153,4 @@ async fn add_path<'a>(mut tx: Transaction<'a, Sqlite>, paths: Vec<String>, row_i
     };
 
     Ok(tx)
-}
-
-async fn list_todos(pool: &SqlitePool) -> Result<()> {
-//     let recs = sqlx::query!(
-//         r#"
-// SELECT id, description, done
-// FROM todos
-// ORDER BY id
-//         "#
-//     )
-//         .fetch_all(pool)
-//         .await?;
-//
-//     for rec in recs {
-//         println!(
-//             "- [{}] {}: {}",
-//             if rec.done { "x" } else { " " },
-//             rec.id,
-//             &rec.description,
-//         );
-//     }
-//
-    Ok(())
 }

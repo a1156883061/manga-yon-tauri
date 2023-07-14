@@ -21,11 +21,11 @@ interface Channel {
   /**
    * 保存宽度百分比
    */
-  'reader/save_width': void;
+  'reader_save_width': void;
   /**
    * 获取宽度百分比
    */
-  'reader/get_width': number;
+  'reader_get_width': number;
 
   'add_comic': ComicDocType | false;
 

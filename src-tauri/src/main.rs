@@ -6,8 +6,10 @@ extern crate core;
 use dotenv::dotenv;
 use crate::dao::init;
 use crate::dao::init::init_pool;
+use crate::reader::reader_cmd;
 
 pub mod cmd;
+pub mod reader;
 pub mod services;
 pub mod dao;
 pub mod common;
@@ -25,7 +27,9 @@ async fn main() {
             cmd::get_store_comic,
             cmd::comic_delete,
             cmd::read_comic,
-            cmd::get_comic
+            cmd::get_comic,
+            reader_cmd::reader_get_width,
+            reader_cmd::reader_save_width
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

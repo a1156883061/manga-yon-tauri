@@ -84,9 +84,7 @@
   async function initWidth() {
     const width = container.value.getBoundingClientRect().width;
     try {
-      let widthPercent = await request('reader/get_width');
-      // TODO 实现
-      widthPercent = 0.9;
+      let widthPercent = await request('reader_get_width');
       if (widthPercent > WIDTH_PERCENT) {
         widthPercent = WIDTH_PERCENT;
       }
@@ -121,7 +119,6 @@
   }
   /**
    * 拖动开始回调函数
-   * @param _e 事件
    * @param dir 拖动的方向
    */
   function dragStart(dir = 1) {
@@ -132,10 +129,11 @@
   }
 
   function saveWidth() {
+    console.log("width change");
     // 获取宽度百分比
     const widthPercent =
       contentWidth.value / container.value.getBoundingClientRect().width;
-    request('reader/save_width', {widthPercent});
+    request('reader_save_width', {width: widthPercent});
   }
 
   function dragEnd() {
