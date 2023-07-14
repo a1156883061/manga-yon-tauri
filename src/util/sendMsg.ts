@@ -1,4 +1,5 @@
 import { SendChannel } from '@/interface/Api';
+import {invoke} from "@tauri-apps/api/tauri";
 
 /**
  * 使用IpcRender.send的形式请求NodeJs
@@ -9,5 +10,5 @@ export default function <K extends SendChannel>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...args: any[]
 ): void {
-  window.ipcRenderer.send(channel, ...args);
+  invoke(channel);
 }
