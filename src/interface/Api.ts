@@ -37,11 +37,6 @@ interface Channel {
 
   'get_comic': [ComicDocType, string[]];
 
-  'reader/save_read-process': void;
+  'reader_save_read_process': void;
 }
-
-type saveReadProcess = 'reader/save-read-process';
-
-type SendChannel = saveReadProcess;
-
-export type { Channel, Response, SendChannel };
+export type { Channel, Response };

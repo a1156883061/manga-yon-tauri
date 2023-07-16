@@ -9,11 +9,11 @@
     <div class="content" :style="{ width: contentWidth + 'px' }">
       <div
         v-for="(comic, index) in comics.path"
-        :index="index"
         :key="index"
         class="img-container"
       >
-        <img :src="comic" :alt="comic" @dragstart.prevent class="comic-img" />
+        <img :src="comic" :alt="comic"
+             :data-index="index" @dragstart.prevent class="comic-img" />
       </div>
     </div>
     <div
@@ -29,12 +29,12 @@
   import { Comic } from '@/interface';
   import { ComicDocType } from '@/store/rxdb';
   import request from '@/util/request';
-  import sendMsg from '@/util/sendMsg';
   import { computed, onMounted, onUnmounted, reactive, Ref, ref } from 'vue';
   import { getImgFromPoint, jumpToReadProcess } from './reader';
   import MenuBtn from '@/components/menu-btn.vue';
   import SettingMenu from '@/components/setting-menu.vue';
   import {window as taWin} from "@tauri-apps/api";
+  import { appWindow } from "@tauri-apps/api/window";
   import {convertFileSrc} from "@tauri-apps/api/tauri";
   let id = 0;
   /**默认宽度百分比 */
@@ -155,13 +155,15 @@
     initWidth();
   });
 
-  function saveReadProcess() {
-    sendMsg('reader/save-read-process', {
+  async function saveReadProcess() {
+    await request('reader_save_read_process', {
       id,
       process: getImgFromPoint(container.value),
     });
   }
-
+  appWindow.onCloseRequested(async (event) => {
+    await saveReadProcess();
+  })
   function showSetting() {
     show.value = true
   }

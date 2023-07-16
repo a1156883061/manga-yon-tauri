@@ -15,6 +15,21 @@ pub(crate) async fn reader_save_width(val: f32) {
     set_val(WIDTH_CODE, val).await.expect("更新失败");
 }
 
+pub(crate) async fn reader_save_read_process(id: i64, process: i32) -> Result<()> {
+    let pool = &get_pool();
+    sqlx::query(
+        r#"
+update manga_info
+set read_process = ?
+where rowid = ?;
+        "#
+    )
+        .bind(process)
+        .bind(id)
+        .execute(pool).await?;
+    Ok(())
+}
+
 async fn get_val(code: i32) -> Result<String> {
     let pool = &get_pool();
     let result: (String, ) = sqlx::query_as(

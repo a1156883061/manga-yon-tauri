@@ -29,7 +29,8 @@ async fn main() {
             cmd::read_comic,
             cmd::get_comic,
             reader_cmd::reader_get_width,
-            reader_cmd::reader_save_width
+            reader_cmd::reader_save_width,
+            reader_cmd::reader_save_read_process
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -7,13 +7,13 @@ import { nextTick } from 'vue';
  * @param selector img selector
  * @returns top img
  */
-export function getImgFromPoint(container: HTMLDivElement): string | null {
+export function getImgFromPoint(container: HTMLDivElement): number | null {
   const imgElement = document.elementFromPoint(
     container.getBoundingClientRect().width / 2,
     100
   );
   if (imgElement) {
-    return imgElement.getAttribute('src');
+    return Number(imgElement.getAttribute('data-index'));
   }
   return null;
 }
@@ -22,9 +22,8 @@ export function jumpToReadProcess(returnData: [ComicDocType, string[]]) {
   nextTick(() => {
     const readProcess = returnData[0].readProcess as unknown as number;
     if (readProcess) {
-      let alt = returnData[1][readProcess]
       const imgElement: HTMLImageElement | null = document.querySelector(
-        `[alt="${alt.replaceAll('\\', '\\\\')}"]`
+        `[data-index="${readProcess}"]`
       );
       console.log('read imgElement', imgElement);
       if (imgElement) {
