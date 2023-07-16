@@ -104,8 +104,9 @@ pub async fn add_comic() -> Option<MangaInfo> {
                 type_code: "".to_string(),
                 sort: 0,
             };
-            let maga_info_op = Some(manga_info);
-            dao::add_comic(&maga_info_op.as_ref().unwrap(), image_info.1).await.expect("TODO: panic message");
+            let mut maga_info_op = Some(manga_info);
+            let id = dao::add_comic(&maga_info_op.as_ref().unwrap(), image_info.1).await.expect("TODO: panic message");
+            maga_info_op.as_mut().unwrap().id = Some(id);
             maga_info_op
         }
     };

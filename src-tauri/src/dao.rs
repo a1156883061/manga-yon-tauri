@@ -11,7 +11,7 @@ pub mod entity;
 
 const BIND_LIMIT: usize = 1000;
 
-pub(crate) async fn add_comic(manga: &MangaInfo, path: Vec<String>) -> Result<()> {
+pub(crate) async fn add_comic(manga: &MangaInfo, path: Vec<String>) -> Result<i64> {
     let mut tx = get_pool().begin().await.expect("");
 
     // Insert the task, then obtain the ID of this row
@@ -40,7 +40,7 @@ insert into manga_info (parent_id,
     tx = add_path(tx, path, row_id).await?;
 
     tx.commit().await?;
-    Ok(())
+    Ok(row_id)
 }
 
 
