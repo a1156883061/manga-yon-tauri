@@ -4,7 +4,6 @@ import { nextTick } from 'vue';
 /**
  * get top img as reader process
  * @param container img container
- * @param selector img selector
  * @returns top img
  */
 export function getImgFromPoint(container: HTMLDivElement): number | null {

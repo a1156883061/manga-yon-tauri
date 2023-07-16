@@ -161,7 +161,7 @@
       process: getImgFromPoint(container.value),
     });
   }
-  appWindow.onCloseRequested(async (event) => {
+  appWindow.onCloseRequested(async () => {
     await saveReadProcess();
   })
   function showSetting() {

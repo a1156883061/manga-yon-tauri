@@ -71,9 +71,8 @@ impl Future for PickFileFuture {
                                                                             , Self::get_file_name_str(path_next)));
                         let file_name_list: Vec<String> = file_list
                             .iter()
-                            .map(|each_file| each_file.to_string_lossy().to_owned().to_string())
+                            .map(|each_file| each_file.to_string_lossy().to_string())
                             .collect();
-                        println!("file_list: {:?}", file_name_list);
                         *arc.lock().unwrap() = Some(Some(ImageInfo(dir_name, file_name_list)));
                     }
                 }
