@@ -25,7 +25,7 @@ pub async fn read_comic(handle: tauri::AppHandle, id: i64) -> Result<(), String>
 pub async fn get_comic(id: i64) -> Result<(MangaInfo, Vec<String>), String> {
     services::get_path_list(id).await.map_err(|e| e.to_string())
 }
-// #[tauri::command]
-// pub async fn add_comic_folder(id: i64) -> Result<Vec<MangaInfo>, String> {
-//     services::add_comic_folder().await.map_err(|e| e.to_string())
-// }
+#[tauri::command]
+pub async fn add_comic_folder() -> Result<Vec<MangaInfo>, String> {
+    Ok(services::add_comic_folder().await)
+}

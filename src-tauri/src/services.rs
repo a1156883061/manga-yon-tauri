@@ -2,7 +2,9 @@ use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
+use std::sync::mpsc;
 use std::task::{Context, Poll};
+use futures::future::join_all;
 use serde::{Deserialize, Serialize};
 use tauri::api::dialog::FileDialogBuilder;
 use tree_magic::from_filepath;
@@ -12,7 +14,6 @@ use crate::dao::entity::MangaInfo;
 use crate::services::file_filter::FILTER_ARR;
 
 pub mod file_filter;
-
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -28,10 +29,6 @@ impl PickFileFuture {
         PickFileFuture {
             file_list: Arc::new(Mutex::new(None))
         }
-    }
-
-    fn get_file_name_str(path_next: &Path) -> &str {
-        path_next.file_name().unwrap().to_str().unwrap()
     }
 }
 
@@ -59,21 +56,8 @@ impl Future for PickFileFuture {
                         if file_list.len() == 1 {
                             file_list = get_file_list(file_list.get(0).unwrap());
                         }
-                        let mut file_list: Vec<&PathBuf> = file_list
-                            .iter()
-                            .filter(|path| path.is_file())
-                            .filter(|each_file_path| {
-                                let mime_type = from_filepath(each_file_path.as_path());
-                                mime_type.starts_with("image/")
-                            }).collect();
-                        file_list
-                            .sort_by(|path_prev, path_next| natord::compare(Self::get_file_name_str(path_prev)
-                                                                            , Self::get_file_name_str(path_next)));
-                        let file_name_list: Vec<String> = file_list
-                            .iter()
-                            .map(|each_file| each_file.to_string_lossy().to_string())
-                            .collect();
-                        *arc.lock().unwrap() = Some(Some(ImageInfo(dir_name, file_name_list)));
+                        let image_info = build_image_info(file_list, dir_name);
+                        *arc.lock().unwrap() = Some(Some(image_info));
                     }
                 }
                 waker.wake();
@@ -83,14 +67,35 @@ impl Future for PickFileFuture {
     }
 }
 
-fn get_dir_name(path: &PathBuf) -> String {
-    String::from(path.parent()
+fn get_file_name_str(path_next: &Path) -> &str {
+    path_next.file_name().unwrap().to_str().unwrap()
+}
+
+fn build_image_info(file_list: Vec<PathBuf>, dir_name: String) -> ImageInfo {
+    let mut file_list: Vec<&PathBuf> = file_list
+        .iter()
+        .filter(|path| path.is_file())
+        .filter(|each_file_path| {
+            let mime_type = from_filepath(each_file_path.as_path());
+            mime_type.starts_with("image/")
+        }).collect();
+    file_list
+        .sort_by(|path_prev, path_next| natord::compare(get_file_name_str(path_prev)
+                                                        , get_file_name_str(path_next)));
+    let file_name_list: Vec<String> = file_list
+        .iter()
+        .map(|each_file| each_file.to_string_lossy().to_string())
+        .collect();
+    ImageInfo(dir_name, file_name_list)
+}
+
+fn get_dir_name(path: &Path) -> String {
+    path.parent()
         .map(Path::file_name)
         .unwrap()
         .unwrap()
         .to_string_lossy()
-        .to_owned()
-        .to_string())
+        .to_string()
 }
 
 /// 1. 添加图片列表
@@ -101,23 +106,52 @@ pub async fn add_comic() -> Option<MangaInfo> {
             None
         }
         Some(image_info) => {
-            let manga_info = MangaInfo {
-                id: None,
-                parent_id: 0,
-                title: image_info.0,
-                cover_path: image_info.1.get(0).unwrap().to_string(),
-                read_process: 0,
-                type_code: "".to_string(),
-                sort: 0,
-            };
-            let mut maga_info_op = Some(manga_info);
-            let id = dao::add_comic(maga_info_op.as_ref().unwrap(), image_info.1).await.expect("TODO: panic message");
-            maga_info_op.as_mut().unwrap().id = Some(id);
-            maga_info_op
+            let manga_info = add_and_get_manga_info(image_info).await;
+            Some(manga_info)
         }
     };
     println!("option: {:?}", option);
     option
+}
+
+async fn add_and_get_manga_info(image_info: ImageInfo) -> MangaInfo {
+    let mut manga_info = MangaInfo {
+        id: None,
+        parent_id: 0,
+        title: image_info.0,
+        cover_path: image_info.1.get(0).unwrap().to_string(),
+        read_process: 0,
+        type_code: "".to_string(),
+        sort: 0,
+    };
+    let id = dao::add_comic(&manga_info, image_info.1).await.expect("TODO: panic message");
+    manga_info.id = Some(id);
+    manga_info
+}
+
+pub async fn add_comic_folder() -> Vec<MangaInfo> {
+    let file_dialog_builder = FileDialogBuilder::new();
+    let (sender, rev) = mpsc::channel();
+    file_dialog_builder.pick_folders(move |folders_op| {
+        match folders_op {
+            None => {
+                sender.send(Vec::new()).unwrap();
+            }
+            Some(folders) => {
+                let image_infos: Vec<ImageInfo> = folders.iter()
+                    .map(|folder| {
+                        let string = folder.file_name().unwrap().to_string_lossy().to_string();
+                        build_image_info(get_file_list_in_folder(folder), string)
+                    }).collect();
+                sender.send(image_infos).unwrap();
+            }
+        }
+    });
+    let image_infos = rev.recv().expect("获取错误");
+    let fu: Vec<_> = image_infos.into_iter().map(|image_info| {
+        add_and_get_manga_info(image_info)
+    }).collect();
+    join_all(fu).await
 }
 
 pub async fn get_store_comic() -> Result<Vec<MangaInfo>> {
@@ -132,7 +166,7 @@ pub async fn read_comic(handle: tauri::AppHandle, id: i64) -> Result<()> {
     tauri::WindowBuilder::new(
         &handle,
         id.to_string(), /* the unique window label */
-        tauri::WindowUrl::App("reader.html".into())
+        tauri::WindowUrl::App("reader.html".into()),
     ).build().unwrap();
     Ok(())
 }
@@ -142,9 +176,12 @@ pub async fn get_path_list(id: i64) -> Result<(MangaInfo, Vec<String>)> {
 }
 
 
-
 fn get_file_list(file: &Path) -> Vec<PathBuf> {
     let parent_path = file.parent().unwrap();
+    get_file_list_in_folder(parent_path)
+}
+
+fn get_file_list_in_folder(parent_path: &Path) -> Vec<PathBuf> {
     parent_path.read_dir().expect("读取目录出错").map(|path| {
         path.unwrap().path()
     }).collect()

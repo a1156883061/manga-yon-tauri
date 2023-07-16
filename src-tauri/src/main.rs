@@ -24,6 +24,7 @@ async fn main() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             cmd::add_comic,
+            cmd::add_comic_folder,
             cmd::get_store_comic,
             cmd::comic_delete,
             cmd::read_comic,
