@@ -5,10 +5,14 @@ use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll};
 use serde::{Deserialize, Serialize};
 use tauri::api::dialog::FileDialogBuilder;
-use tree_magic::{from_filepath};
+use tree_magic::from_filepath;
 use crate::common::Result;
 use crate::dao;
 use crate::dao::entity::MangaInfo;
+use crate::services::file_filter::FILTER_ARR;
+
+pub mod file_filter;
+
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,7 +30,7 @@ impl PickFileFuture {
         }
     }
 
-    fn get_file_name_str(path_next: &PathBuf) -> &str {
+    fn get_file_name_str(path_next: &Path) -> &str {
         path_next.file_name().unwrap().to_str().unwrap()
     }
 }
@@ -41,7 +45,10 @@ impl Future for PickFileFuture {
         } else {
             let waker = cx.waker().clone();
             let arc = self.file_list.clone();
-            let file_dialog_builder = FileDialogBuilder::new();
+            let mut file_dialog_builder = FileDialogBuilder::new();
+            for file_filter in FILTER_ARR {
+                file_dialog_builder = file_dialog_builder.add_filter(file_filter.name(), file_filter.extensions());
+            }
             file_dialog_builder.pick_files(move |file| {
                 match file {
                     None => {
@@ -64,7 +71,7 @@ impl Future for PickFileFuture {
                                                                             , Self::get_file_name_str(path_next)));
                         let file_name_list: Vec<String> = file_list
                             .iter()
-                            .map(|each_file| String::from(each_file.to_string_lossy().to_owned().to_string()))
+                            .map(|each_file| each_file.to_string_lossy().to_owned().to_string())
                             .collect();
                         println!("file_list: {:?}", file_name_list);
                         *arc.lock().unwrap() = Some(Some(ImageInfo(dir_name, file_name_list)));
@@ -105,7 +112,7 @@ pub async fn add_comic() -> Option<MangaInfo> {
                 sort: 0,
             };
             let mut maga_info_op = Some(manga_info);
-            let id = dao::add_comic(&maga_info_op.as_ref().unwrap(), image_info.1).await.expect("TODO: panic message");
+            let id = dao::add_comic(maga_info_op.as_ref().unwrap(), image_info.1).await.expect("TODO: panic message");
             maga_info_op.as_mut().unwrap().id = Some(id);
             maga_info_op
         }
@@ -123,7 +130,7 @@ pub async fn comic_delete(id: i64) -> Result<()> {
 }
 
 pub async fn read_comic(handle: tauri::AppHandle, id: i64) -> Result<()> {
-    let docs_window = tauri::WindowBuilder::new(
+    tauri::WindowBuilder::new(
         &handle,
         id.to_string(), /* the unique window label */
         tauri::WindowUrl::App("reader.html".into())
@@ -137,7 +144,7 @@ pub async fn get_path_list(id: i64) -> Result<(MangaInfo, Vec<String>)> {
 
 
 
-fn get_file_list(file: &PathBuf) -> Vec<PathBuf> {
+fn get_file_list(file: &Path) -> Vec<PathBuf> {
     let parent_path = file.parent().unwrap();
     parent_path.read_dir().expect("读取目录出错").map(|path| {
         path.unwrap().path()
