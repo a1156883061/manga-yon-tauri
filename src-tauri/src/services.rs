@@ -72,6 +72,16 @@ fn get_file_name_str(path_next: &Path) -> &str {
 }
 
 fn build_image_info(file_list: Vec<PathBuf>, dir_name: String) -> ImageInfo {
+    let file_name_list = get_image_file_name_list(file_list);
+    ImageInfo(dir_name, file_name_list)
+}
+
+///
+/// 过滤非图片文件
+/// 按照自然顺序排序文件名 [2, 04 , 3] -> [2, 3, 04]
+/// 转换为文件路径string
+///
+fn get_image_file_name_list(file_list: Vec<PathBuf>) -> Vec<String> {
     let mut file_list: Vec<&PathBuf> = file_list
         .iter()
         .filter(|path| path.is_file())
@@ -86,7 +96,7 @@ fn build_image_info(file_list: Vec<PathBuf>, dir_name: String) -> ImageInfo {
         .iter()
         .map(|each_file| each_file.to_string_lossy().to_string())
         .collect();
-    ImageInfo(dir_name, file_name_list)
+    file_name_list
 }
 
 fn get_dir_name(path: &Path) -> String {
@@ -140,8 +150,12 @@ pub async fn add_comic_folder() -> Vec<MangaInfo> {
             Some(folders) => {
                 let image_infos: Vec<ImageInfo> = folders.iter()
                     .map(|folder| {
-                        let string = folder.file_name().unwrap().to_string_lossy().to_string();
-                        build_image_info(get_file_list_in_folder(folder), string)
+                        (folder, get_image_file_name_list(get_file_list_in_folder(folder)))
+                    })
+                    .filter(|(_, file_list)| !file_list.is_empty())
+                    .map(|(folder, file_name_list)| {
+                        let dir_name = folder.file_name().unwrap().to_string_lossy().to_string();
+                        ImageInfo(dir_name, file_name_list)
                     }).collect();
                 sender.send(image_infos).unwrap();
             }
