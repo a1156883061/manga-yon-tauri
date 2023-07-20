@@ -4,7 +4,6 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 use std::task::{Context, Poll};
-use futures::future::join_all;
 use serde::{Deserialize, Serialize};
 use tauri::api::dialog::FileDialogBuilder;
 use tree_magic::from_filepath;
@@ -148,7 +147,7 @@ pub async fn add_comic_folder() -> Vec<MangaInfo> {
                 sender.send(Vec::new()).unwrap();
             }
             Some(folders) => {
-                let image_infos: Vec<ImageInfo> = folders.iter()
+                let mut image_infos: Vec<ImageInfo> = folders.iter()
                     .map(|folder| {
                         (folder, get_image_file_name_list(get_file_list_in_folder(folder)))
                     })
@@ -156,16 +155,20 @@ pub async fn add_comic_folder() -> Vec<MangaInfo> {
                     .map(|(folder, file_name_list)| {
                         let dir_name = folder.file_name().unwrap().to_string_lossy().to_string();
                         ImageInfo(dir_name, file_name_list)
-                    }).collect();
+                    })
+                    .collect();
+                image_infos.sort_by(|info_prev, info_next| natord::compare( &info_next.0, &info_prev.0,));
                 sender.send(image_infos).unwrap();
             }
         }
     });
     let image_infos = rev.recv().expect("获取错误");
-    let fu: Vec<_> = image_infos.into_iter().map(|image_info| {
-        add_and_get_manga_info(image_info)
-    }).collect();
-    join_all(fu).await
+    let mut add_image_infos: Vec<MangaInfo> = Vec::with_capacity(image_infos.len());
+    for image_info in image_infos.into_iter() {
+        let info = add_and_get_manga_info(image_info).await;
+        add_image_infos.push(info);
+    }
+    add_image_infos
 }
 
 pub async fn get_store_comic() -> Result<Vec<MangaInfo>> {

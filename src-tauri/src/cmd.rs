@@ -8,7 +8,10 @@ pub async fn add_comic() -> Result<Option<MangaInfo>, String> {
 
 #[tauri::command]
 pub async fn get_store_comic() -> Result<Vec<MangaInfo>, String> {
-    services::get_store_comic().await.map_err(|e| e.to_string())
+    services::get_store_comic().await.map_err(|e| {
+        println!("{:?}", e);
+        e.to_string()
+    })
 }
 
 #[tauri::command]
