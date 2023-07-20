@@ -11,6 +11,7 @@ use crate::common::Result;
 use crate::dao;
 use crate::dao::entity::MangaInfo;
 use crate::services::file_filter::FILTER_ARR;
+use rayon::prelude::*;
 
 pub mod file_filter;
 
@@ -82,14 +83,14 @@ fn build_image_info(file_list: Vec<PathBuf>, dir_name: String) -> ImageInfo {
 ///
 fn get_image_file_name_list(file_list: Vec<PathBuf>) -> Vec<String> {
     let mut file_list: Vec<&PathBuf> = file_list
-        .iter()
+        .par_iter()
         .filter(|path| path.is_file())
         .filter(|each_file_path| {
             let mime_type = from_filepath(each_file_path.as_path());
             mime_type.starts_with("image/")
         }).collect();
     file_list
-        .sort_by(|path_prev, path_next| natord::compare(get_file_name_str(path_prev)
+        .par_sort_by(|path_prev, path_next| natord::compare(get_file_name_str(path_prev)
                                                         , get_file_name_str(path_next)));
     let file_name_list: Vec<String> = file_list
         .iter()
