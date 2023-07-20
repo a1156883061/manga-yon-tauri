@@ -47,8 +47,8 @@ create table config_dict
     code integer,
     val  text
 );
-create unique index main.config_dict_code_uindex
-    on main.config_dict (code);
+create unique index config_dict_code_uindex
+    on config_dict (code);
 INSERT INTO config_dict (code, val) VALUES (1, '0.8');
 
 
