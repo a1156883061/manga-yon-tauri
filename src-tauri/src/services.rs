@@ -4,9 +4,9 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 use std::task::{Context, Poll};
+use mime_guess::mime;
 use serde::{Deserialize, Serialize};
 use tauri::api::dialog::FileDialogBuilder;
-use tree_magic::from_filepath;
 use crate::common::Result;
 use crate::dao;
 use crate::dao::entity::MangaInfo;
@@ -86,8 +86,10 @@ fn get_image_file_name_list(file_list: Vec<PathBuf>) -> Vec<String> {
         .par_iter()
         .filter(|path| path.is_file())
         .filter(|each_file_path| {
-            let mime_type = from_filepath(each_file_path.as_path());
-            mime_type.starts_with("image/")
+            // let mime_type = from_filepath(each_file_path.as_path());
+            let mime_type = mime_guess::from_path(each_file_path);
+            mime_type.first_or(mime::APPLICATION_OCTET_STREAM).type_().eq(&mime::IMAGE)
+            // mime_type.starts_with("image/")
         }).collect();
     file_list
         .par_sort_by(|path_prev, path_next| natord::compare(get_file_name_str(path_prev)
