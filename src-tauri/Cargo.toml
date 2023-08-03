@@ -15,7 +15,7 @@ tauri-build = { version = "1.4", features = [] }
 [dependencies]
 tauri = { version = "1.4.1", features = ["shell-open", "dialog", "protocol-asset", "window-close"] }
 serde = { version = "1.0", features = ["derive"] }
-tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+tauri-plugin-window-state = { git = "https://github.com/a1156883061/plugins-workspace", branch = "group-v2" }
 tree_magic = "0.2.3"
 natord = "1.0.9"
 sqlx = { version = "0.7.0", features = ["runtime-tokio", "sqlite"] }

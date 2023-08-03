@@ -4,6 +4,8 @@
 extern crate core;
 
 use dotenv::dotenv;
+use tauri_plugin_window_state::Group;
+
 use crate::dao::init;
 use crate::dao::init::init_pool;
 use crate::reader::reader_cmd;
@@ -21,7 +23,9 @@ async fn main() {
     init_pool().await;
     // init::migrate().await.expect("迁移失败");
     tauri::Builder::default()
-        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(tauri_plugin_window_state::Builder::default()
+            .add_group(Group::new("reader".into(), |label| label != "main"))
+            .build())
         .invoke_handler(tauri::generate_handler![
             cmd::add_comic,
             cmd::add_comic_folder,
